@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netbox-plugin-sdwan-vmanage"
+version = "0.1.0"
+description = "NetBox plugin that integrates with Cisco vManage SD-WAN"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.8"
+dependencies = [
+    "requests>=2.28",
+]
+
+[project.optional-dependencies]
+dev = []
+
+[tool.setuptools.packages.find]
+include = ["netbox_sdwan*"]
