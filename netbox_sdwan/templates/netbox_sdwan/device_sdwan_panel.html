@@ -1,0 +1,90 @@
+{% load i18n %}
+{% load helpers %}
+
+<div class="card mb-3">
+  <div class="card-header d-flex align-items-center">
+    <strong>{% trans "SD-WAN (vManage)" %}</strong>
+    <div class="ms-auto">
+      <a href="{% url 'plugins:netbox_sdwan:mapping-edit' device_id=object.pk %}"
+         class="btn btn-sm btn-outline-primary">
+        <i class="mdi mdi-pencil"></i>
+        {% if sdwan_mapping %}{% trans "Edit" %}{% else %}{% trans "Configure" %}{% endif %}
+      </a>
+    </div>
+  </div>
+
+  {% if sdwan_mapping %}
+  <div class="card-body">
+    <table class="table table-borderless mb-0">
+      <tr>
+        <th scope="row" class="w-25">{% trans "Config Group" %}</th>
+        <td>{{ sdwan_mapping.config_group_name|default:"—" }}</td>
+      </tr>
+      <tr>
+        <th scope="row">{% trans "RP Serial" %}</th>
+        <td>{{ sdwan_mapping.rp_serial|default:"—" }}</td>
+      </tr>
+      <tr>
+        <th scope="row">{% trans "Device ID" %}</th>
+        <td>
+          {% if sdwan_mapping.device_id %}
+            <code>{{ sdwan_mapping.device_id }}</code>
+          {% else %}
+            <span class="text-muted">{% trans "Not computed (missing RP serial)" %}</span>
+          {% endif %}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card-footer d-flex flex-wrap gap-2">
+    {# Associate #}
+    <form method="post"
+          action="{% url 'plugins:netbox_sdwan:associate' device_id=object.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-secondary"
+              {% if not sdwan_mapping.device_id or not sdwan_mapping.config_group_name %}disabled{% endif %}>
+        <i class="mdi mdi-link-variant"></i> {% trans "Associate" %}
+      </button>
+    </form>
+
+    {# Set Variables #}
+    <form method="post"
+          action="{% url 'plugins:netbox_sdwan:set-variables' device_id=object.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-secondary"
+              {% if not sdwan_mapping.device_id or not sdwan_mapping.config_group_name %}disabled{% endif %}>
+        <i class="mdi mdi-variable"></i> {% trans "Set Variables" %}
+      </button>
+    </form>
+
+    {# Deploy #}
+    <form method="post"
+          action="{% url 'plugins:netbox_sdwan:deploy' device_id=object.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-sm btn-warning"
+              {% if not sdwan_mapping.device_id or not sdwan_mapping.config_group_name %}disabled{% endif %}>
+        <i class="mdi mdi-rocket-launch"></i> {% trans "Deploy" %}
+      </button>
+    </form>
+
+    {# Bootstrap #}
+    <a href="{% url 'plugins:netbox_sdwan:bootstrap' device_id=object.pk %}"
+       class="btn btn-sm btn-info"
+       {% if not sdwan_mapping.device_id %}aria-disabled="true" tabindex="-1"{% endif %}>
+      <i class="mdi mdi-download"></i> {% trans "Fetch Bootstrap" %}
+    </a>
+  </div>
+
+  {% else %}
+  <div class="card-body text-muted">
+    <em>{% trans "No SD-WAN mapping configured for this device." %}</em>
+    <div class="mt-2">
+      <a href="{% url 'plugins:netbox_sdwan:mapping-edit' device_id=object.pk %}"
+         class="btn btn-sm btn-primary">
+        <i class="mdi mdi-plus-thick"></i> {% trans "Add SD-WAN Mapping" %}
+      </a>
+    </div>
+  </div>
+  {% endif %}
+</div>

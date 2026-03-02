@@ -1,0 +1,68 @@
+{% extends 'base/layout.html' %}
+{% load i18n %}
+{% load helpers %}
+
+{% block title %}{% trans "Bootstrap Config" %} — {{ device }}{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+  <div class="col">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dcim:device_list' %}">{% trans "Devices" %}</a></li>
+        <li class="breadcrumb-item">
+          <a href="{% url 'dcim:device' pk=device.pk %}">{{ device }}</a>
+        </li>
+        <li class="breadcrumb-item active">{% trans "Bootstrap Config" %}</li>
+      </ol>
+    </nav>
+    <h1>{% trans "SD-WAN Bootstrap Config" %} — {{ device }}</h1>
+  </div>
+</div>
+
+<div class="row mb-2">
+  <div class="col">
+    <table class="table table-borderless w-auto">
+      <tr>
+        <th>{% trans "Device ID" %}</th>
+        <td><code>{{ mapping.device_id|default:"—" }}</code></td>
+      </tr>
+      <tr>
+        <th>{% trans "Config Group" %}</th>
+        <td>{{ mapping.config_group_name|default:"—" }}</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+{% if error %}
+<div class="alert alert-danger" role="alert">
+  <strong>{% trans "Error fetching bootstrap config:" %}</strong> {{ error }}
+</div>
+{% endif %}
+
+{% if bootstrap_config %}
+<div class="card">
+  <div class="card-header d-flex align-items-center">
+    <strong>{% trans "Bootstrap Configuration (cloud-init)" %}</strong>
+    <div class="ms-auto">
+      <button class="btn btn-sm btn-outline-secondary"
+              onclick="navigator.clipboard.writeText(document.getElementById('bootstrap-pre').innerText)">
+        <i class="mdi mdi-content-copy"></i> {% trans "Copy" %}
+      </button>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <pre id="bootstrap-pre" class="m-0 p-3" style="max-height: 70vh; overflow: auto; white-space: pre-wrap; word-break: break-all; background: #1e1e1e; color: #d4d4d4; border-radius: 0 0 4px 4px;">{{ bootstrap_config }}</pre>
+  </div>
+</div>
+{% elif not error %}
+<div class="alert alert-info">{% trans "No bootstrap configuration returned." %}</div>
+{% endif %}
+
+<div class="mt-3">
+  <a href="{% url 'dcim:device' pk=device.pk %}" class="btn btn-outline-secondary">
+    <i class="mdi mdi-arrow-left"></i> {% trans "Back to Device" %}
+  </a>
+</div>
+{% endblock %}
